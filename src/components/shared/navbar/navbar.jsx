@@ -1,6 +1,10 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { NavPath } from "./navbarPath";
+import { signOut, useSession } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
 
 const links = [
   { href: "/", label: "Home" },
@@ -11,6 +15,15 @@ const links = [
 ];
 
 export default function Navbar() {
+  const router = useRouter();
+
+  const { data: session, isPending } = useSession();
+
+  const handleLogout = async () => {
+    await signOut();
+    router.push("/");
+  };
+
   return (
     <nav className="navbar backdrop-blur-md bg-base-100/80 sticky top-0 z-50 border-b border-base-300 px-4 lg:px-10">
       <div className="navbar-start">
@@ -28,43 +41,49 @@ export default function Navbar() {
       </div>
       <div className="navbar-end gap-2">
         {/* <ThemeToggleBtn /> */}
-        {/* {session ? ( */}
-        <div className="dropdown dropdown-end">
-          {/* <div tabIndex={0} className="avatar cursor-pointer">
-            <div className="w-9 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-              { <Image
-                src={session.user?.image || "/default-avatar.png"}
-                alt="profile"
-                width={24}
-                height={24}
-                className="object-cover"
-              />}
+        {session ? (
+          <div className="dropdown dropdown-end">
+            <div tabIndex={0} className="avatar cursor-pointer">
+              <div className="w-9 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+                {
+                  <Image
+                    src={session.user?.image || "/default-avatar.png"}
+                    alt="profile"
+                    width={24}
+                    height={24}
+                    className="object-cover"
+                  />
+                }
+              </div>
             </div>
-          </div> */}
-          <ul
-            tabIndex={0}
-            className="dropdown-content menu bg-base-200 rounded-2xl z-1 w-52 p-2 shadow mt-2"
-          >
-            {/* <li className="px-3 py-2 text-sm font-semibold text-base-content/60">
-              {session.user?.name}
-            </li> */}
-            <li>
-              <Link href="/add-car">Add Car</Link>
-            </li>
-            <li>
-              <Link href="/my-bookings">My Bookings</Link>
-            </li>
-            <li>
-              <Link href="/my-cars">My Added Cars</Link>
-            </li>
-            <li>{/* <SignOutBtn /> */}</li>
-          </ul>
-        </div>
-        {/* ) : ( */}
-        <Link href="/login" className="btn btn-primary btn-sm rounded-full">
-          Login
-        </Link>
-        {/* )} */}
+            <ul
+              tabIndex={0}
+              className="dropdown-content menu bg-base-200 rounded-2xl z-1 w-52 p-2 shadow mt-2"
+            >
+              <li className="px-3 py-2 text-sm font-semibold text-base-content/60">
+                {session.user?.name}
+              </li>
+              <li>
+                <Link href="/add-car">Add Car</Link>
+              </li>
+              <li>
+                <Link href="/my-bookings">My Bookings</Link>
+              </li>
+              <li>
+                <Link href="/my-cars">My Added Cars</Link>
+              </li>
+              <li>
+                <button onClick={handleLogout} className="btn btn-ghost btn-sm">
+                  Sign Out
+                </button>
+              </li>
+            </ul>
+          </div>
+        ) : (
+          <Link href="/login" className="btn btn-primary btn-sm rounded-full">
+            Login
+          </Link>
+        )}
       </div>
     </nav>
   );
